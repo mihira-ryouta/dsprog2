@@ -1,5 +1,5 @@
 import flet as ft
-
+import math
 
 class CalcButton(ft.ElevatedButton):
     def __init__(self, text, button_clicked, expand=1):
@@ -37,53 +37,86 @@ class CalculatorApp(ft.Container):
         self.reset()
 
         self.result = ft.Text(value="0", color=ft.Colors.WHITE, size=20)
-        self.width = 350
+        self.width = 700
         self.bgcolor = ft.Colors.BLACK
         self.border_radius = ft.border_radius.all(20)
         self.padding = 20
-        self.content = ft.Column(
+        
+        #左側に化学計算ボタンがくるように
+        self.content = ft.Row(
             controls=[
-                ft.Row(controls=[self.result], alignment="end"),
-                ft.Row(
+                ft.Column(
                     controls=[
-                        ExtraActionButton(text="AC", button_clicked=self.button_clicked),
-                        ExtraActionButton(text="+/-", button_clicked=self.button_clicked),
-                        ExtraActionButton(text="%", button_clicked=self.button_clicked),
-                        ActionButton(text="/", button_clicked=self.button_clicked),
-                    ]
-                ),
-                ft.Row(
+                        ft.Row(
+                            controls=[
+                                ExtraActionButton(text="1/x", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="π", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="√", button_clicked=self.button_clicked),
+                            ],
+                        ),
+                        ft.Row(
+                            controls=[
+                                ExtraActionButton(text="x²", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="x³", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="xʸ", button_clicked=self.button_clicked),
+                            ],
+                        ),
+                        ft.Row(
+                            controls=[
+                                ExtraActionButton(text="10ˣ", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="log10", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="x!", button_clicked=self.button_clicked),
+                            ],
+                        ),
+                    ],       expand=1,#左側の列を狭くする(スマホがそうしてたから)        
+                ),         
+            
+                #右に普通の計算機ボタンがくるように
+                ft.Column(
                     controls=[
-                        DigitButton(text="7", button_clicked=self.button_clicked),
-                        DigitButton(text="8", button_clicked=self.button_clicked),
-                        DigitButton(text="9", button_clicked=self.button_clicked),
-                        ActionButton(text="*", button_clicked=self.button_clicked),
-                    ]
+                        ft.Row(controls=[self.result], alignment="end"),
+                        ft.Row(
+                            controls=[
+                                ExtraActionButton(text="AC", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="+/-", button_clicked=self.button_clicked),
+                                ExtraActionButton(text="%", button_clicked=self.button_clicked),
+                                ActionButton(text="/", button_clicked=self.button_clicked),
+                            ]
+                        ),
+                        ft.Row(
+                            controls=[
+                                DigitButton(text="7", button_clicked=self.button_clicked),
+                                DigitButton(text="8", button_clicked=self.button_clicked),
+                                DigitButton(text="9", button_clicked=self.button_clicked),
+                                ActionButton(text="*", button_clicked=self.button_clicked),
+                            ]
+                        ),
+                        ft.Row(
+                            controls=[
+                                DigitButton(text="4", button_clicked=self.button_clicked),
+                                DigitButton(text="5", button_clicked=self.button_clicked),
+                                DigitButton(text="6", button_clicked=self.button_clicked),
+                                ActionButton(text="-", button_clicked=self.button_clicked),
+                            ]
+                        ),
+                        ft.Row(
+                            controls=[
+                                DigitButton(text="1", button_clicked=self.button_clicked),
+                                DigitButton(text="2", button_clicked=self.button_clicked),
+                                DigitButton(text="3", button_clicked=self.button_clicked),
+                                ActionButton(text="+", button_clicked=self.button_clicked),
+                            ]
+                        ),
+                        ft.Row(
+                            controls=[
+                                DigitButton(text="0", expand=2, button_clicked=self.button_clicked),
+                                DigitButton(text=".", button_clicked=self.button_clicked),
+                                ActionButton(text="=", button_clicked=self.button_clicked),
+                            ],
+                        ),
+                    ], expand=2,
                 ),
-                ft.Row(
-                    controls=[
-                        DigitButton(text="4", button_clicked=self.button_clicked),
-                        DigitButton(text="5", button_clicked=self.button_clicked),
-                        DigitButton(text="6", button_clicked=self.button_clicked),
-                        ActionButton(text="-", button_clicked=self.button_clicked),
-                    ]
-                ),
-                ft.Row(
-                    controls=[
-                        DigitButton(text="1", button_clicked=self.button_clicked),
-                        DigitButton(text="2", button_clicked=self.button_clicked),
-                        DigitButton(text="3", button_clicked=self.button_clicked),
-                        ActionButton(text="+", button_clicked=self.button_clicked),
-                    ]
-                ),
-                ft.Row(
-                    controls=[
-                        DigitButton(text="0", expand=2, button_clicked=self.button_clicked),
-                        DigitButton(text=".", button_clicked=self.button_clicked),
-                        ActionButton(text="=", button_clicked=self.button_clicked),
-                    ]
-                ),
-            ]
+            ],
         )
 
     def button_clicked(self, e):
@@ -123,6 +156,58 @@ class CalculatorApp(ft.Container):
 
             elif float(self.result.value) < 0:
                 self.result.value = str(self.format_number(abs(float(self.result.value))))
+        
+        
+        #化学計算ボタンの処理
+        elif data in ("π"): 
+            self.result.value = str(self.format_number(math.pi))
+            self.new_operand = True 
+        
+        elif data in ("√"):
+            if float(self.result.value) < 0: #負の数の平方根はエラー
+                self.result.value = "Error"
+            else:
+                self.result.value = str(self.format_number(math.sqrt(float(self.result.value))))
+            self.new_operand = True
+        
+        elif data in ("1/x"):
+            if float(self.result.value) == 0: #0の逆数はエラー
+                self.result.value = "Error"
+            else:
+                self.result.value = str(self.format_number(1 / float(self.result.value)))
+            self.new_operand = True
+        
+        elif data in ("x²"):
+            self.result.value = str(self.format_number(float(self.result.value) ** 2))
+            self.new_operand = True
+
+        elif data in ("x³"):
+            self.result.value = str(self.format_number(float(self.result.value) ** 3))
+            self.new_operand = True 
+
+        elif data in ("xʸ"):
+            self.operand1 = float(self.result.value)
+            self.operator = "**" #べき乗の演算子
+            self.new_operand = True
+
+        elif data in ("10ˣ"):
+            self.result.value = str(self.format_number(10 ** float(self.result.value)))
+            self.new_operand = True
+        
+        elif data in ("log10"):
+            if float(self.result.value) <= 0: #0以下の対数はエラー
+                self.result.value = "Error"
+            else:
+                self.result.value = str(self.format_number(math.log10(float(self.result.value))))
+            self.new_operand = True
+        
+        elif data in ("x!"):
+            if float(self.result.value) < 0 or float(self.result.value) % 1 != 0: #負の数と小数の階乗はエラー
+                self.result.value = "Error"
+            else:
+                self.result.value = str(self.format_number(math.factorial(int(float(self.result.value)))))
+            self.new_operand = True
+    
 
         self.update()
 
@@ -148,6 +233,11 @@ class CalculatorApp(ft.Container):
                 return "Error"
             else:
                 return self.format_number(operand1 / operand2)
+        
+        # べき乗の計算
+        elif operator == "**":  
+            return self.format_number(operand1 ** operand2) #x ** yを計算
+        
 
     def reset(self):
         self.operator = "+"
