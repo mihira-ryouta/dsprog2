@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 
 # ヘルパー: 天気コードを日本語テキストに変換する辞書
 # これによって、週間予報の数字データ(101など)をテキスト解析ロジック("晴時々曇")に渡せる
-# 参考に https://www.t3a.jp/blog/web-develop/weather-code-list/　を使用
+# 参考に https://www.t3a.jp/blog/web-develop/weather-code-list/  を使用した
 CODE_TO_TEXT = {
     "100": "晴れ",
     "101": "晴時々曇",
@@ -135,7 +135,7 @@ def format_short_weather_text(text):
     cleaned_text = " ".join(cleaned_text.split())
     return cleaned_text
 
-# ヘルパー関数: アイコン、色、テキスト解析から天気表示を作成
+# ヘルパー関数： アイコン、色、テキスト解析から天気表示を作成
 def create_weather_display_from_text(weather_text):
     weather_keywords = {
         "雪": (ft.Icons.SNOWING, ft.Colors.CYAN),
@@ -185,7 +185,7 @@ def main(page: ft.Page):
     URL = "http://www.jma.go.jp/bosai/common/const/area.json"
     # データ取得
     try:
-        date_json = requests.get(URL).json() #スライドで指定された形になっているはず、、、
+        date_json = requests.get(URL).json() #スライドで指定された形になっている
     except:
         page.add(ft.Text("データ取得エラー"))
         return
@@ -250,7 +250,7 @@ def main(page: ft.Page):
             page.open(ft.SnackBar(ft.Text(f"{publishing_office} 発表 (週間予報)"), duration=2000)) 
 
             # 週間予報のデータを取得
-            # timeSeries[0] -> 天気コード (weatherCodes) ・　timeSeries[1] -> 気温 (tempsMin, tempsMax)ととして扱う
+            # timeSeries[0]: 天気予報
             
             weekly_weather_series = weekly_data['timeSeries'][0]
             weekly_temp_series = weekly_data['timeSeries'][1]
@@ -280,7 +280,7 @@ def main(page: ft.Page):
                 # 天気コード取得
                 code = weather_codes[i] if i < len(weather_codes) else "100"
                 
-                # ★ここでコードをテキストに変換（例: "101" -> "晴時々曇"）
+                # コードをテキストに変換（例: "101" -> "晴時々曇"）
                 # マップにない場合は "晴れ" などを仮置きする
                 weather_text = CODE_TO_TEXT.get(code, "晴れ")
 
@@ -306,7 +306,7 @@ def main(page: ft.Page):
                             ft.Text(date_label, weight="bold", color=ft.Colors.BLACK87),
                             ft.Container(height=10),
                             ft.Container(content=weather_icon_display, height=80, alignment=ft.alignment.center),
-                            ft.Container(height=5),
+                            ft.Container(height=5),  # 天気アイコンとテキストの間隔
                             
                             ft.Text(
                                 short_text,
@@ -316,7 +316,7 @@ def main(page: ft.Page):
                                 text_align=ft.TextAlign.CENTER,
                                 max_lines=2,
                                 overflow=ft.TextOverflow.ELLIPSIS
-                            ),
+                            ),  # 天気テキスト
                             ft.Container(height=15),
                             
                             ft.Row(
@@ -326,15 +326,15 @@ def main(page: ft.Page):
                                     ft.Text(f"{max_temp}℃", color=ft.Colors.RED, weight="bold", size=16),
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER
-                            )
+                            ) # 気温表示
                         ],
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=0
-                    )
-                )
+                    ) 
+                ) 
                 cards_grid.controls.append(card)
 
-        except Exception as err:
+        except Exception as err: # エラー処理
             cards_grid.controls.clear()
             cards_grid.controls.append(ft.Text(f"エラー: {err}", color=ft.Colors.RED))
             print(err)
